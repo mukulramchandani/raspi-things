@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mukulramchandani/raspi-things/issues"
   },
-  "homepage": "https://github.com/mukulramchandani/raspi-things#readme"
+  "homepage": "https://github.com/mukulramchandani/raspi-things#readme",
+  "dependencies": {
+    "rpi-gpio": "^0.9.1"
+  }
 }

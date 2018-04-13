@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/mukulramchandani/raspi-things#readme",
   "dependencies": {
+    "aws-iot-device-sdk": "^2.2.1",
+    "onoff": "^1.2.0",
+    "pi-gpio": "0.0.8",
     "rpi-gpio": "^0.9.1"
   }
 }

@@ -16,7 +16,7 @@ gpio.setMode('mode_bcm');
 var awsConfig = {
     "region": "us-east-1",
     "endpoint": "http://dynamodb.us-east-1.amazonaws.com",
-    "accessKeyId": "AKIAIDQA6MHYZW6A67CQ", "secretAccessKey": "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"
+    "accessKeyId": "xxxxxxxxxxxxx", "secretAccessKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 };
 
 AWS.config.update(awsConfig);

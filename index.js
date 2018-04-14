@@ -9,41 +9,110 @@ var relay = new Gpio(11,'out');
 
 var awsIot = require('aws-iot-device-sdk');
 
+var AWS = require('aws-sdk');
+
 gpio.setMode('mode_bcm');
 
+var awsConfig = {
+    "region": "us-east-1",
+    "endpoint": "http://dynamodb.us-east-1.amazonaws.com",
+    "accessKeyId": "AKIAIDQA6MHYZW6A67CQ", "secretAccessKey": "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"
+};
+
+AWS.config.update(awsConfig);
 
 var count=0 ;
 
-var device = awsIot.device({
-  keyPath: '9e81cd9844-private.pem',
-  certPath: '9e81cd9844-certificate.pem',
-  caPath: 'rootCA.pem',
-  clientId: 'prepaid-meter',
-  region: 'us-east-1',
-  host: 'a1gclxlf7o8zk9.iot.us-east-1.amazonaws.com',
-});
+var data1 = 0 ;
 
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+
+
+function putData() {
+
+  var params = {
+        
+        Item:{
+            id : "0" ,
+            message : count.toString(),
+        },
+        
+        TableName : 'consumption'
+        
+    };
+    
+    docClient.put(params, function(err,data){
+        if (err) {
+         
+            console.log('Error saving Data!',err.stack);
+        } else {
+            
+            console.log('Data Saved!', data);
+        }
+        
+    });
+  
+}
+
+
+function getData() {
+
+    var params = {
+        TableName: "rechargeMMM",
+        Key: {
+            "id": "0"
+        }
+    };
+    docClient.get(params, function (err, data) {
+        if (err) {
+            console.log("error - " + JSON.stringify(err, null, 2));
+        }
+        else {
+            console.log("success - " + JSON.stringify(data, null, 2));
+        data1 = data.Item.message;
+
+            return data1 ;
+        }
+    });   
+}
+
+getData();
+
+
+function relayOff(){
+    if(count >= data1){
+    relay.write(0, function(err){
+      if (err) throw err;
+      console.log('relay-off');
+    });
+
+    relay.unexport();
+}
+else return;
+
+  } 
+
+
+
+//console.log(data1);
+
+
+// var device = awsIot.device({
+//   keyPath: '9e81cd9844-private.pem',
+//   certPath: '9e81cd9844-certificate.pem',
+//   caPath: 'rootCA.pem',
+//   clientId: 'prepaid-meter',
+//   region: 'us-east-1',
+//   host: 'a1gclxlf7o8zk9.iot.us-east-1.amazonaws.com',
+// });
 
 gpio.on('change', function(channel, value) {
 	console.log('Channel ' + channel + ' value is now ' + value);
   count++;
 
-//   device
-//   .on('connect', function() {
-//     console.log('connect');
-//    // device.subscribe('topic_1');
-//     device.publish('prepaid', JSON.stringify({ test_data: count}));
-//     console.log("Published!!");
-//   });
 
-// device
-//   .on('message', function(topic, payload) {
-//     console.log('message', topic, payload.toString());
-//   });  
-
-
-
-  console.log(count);
+  console.log(count,data1);
 
     if(count >= 10){
     count = count % 10;
@@ -53,14 +122,14 @@ gpio.on('change', function(channel, value) {
     count = count % 100;
     count--;
     }
- var a=10;
- var b=7;
- var c=19;
- var d=23;
- var e=18;
- var f=27;
- var g=06;
- var dot=9;
+    var a=10;
+    var b=7;
+    var c=19;
+    var d=23;
+    var e=18;
+    var f=27;
+    var g=06;
+    var dot=9;
 // gpio.setup(11, gpio.DIR_LOW, write);
 gpio.setup(a, gpio.DIR_OUT, write);
 gpio.setup(b, gpio.DIR_OUT, write);
@@ -71,7 +140,6 @@ gpio.setup(d, gpio.DIR_OUT, write);
 gpio.setup(f, gpio.DIR_OUT, write);
 gpio.setup(g, gpio.DIR_OUT, write);
 gpio.setup(dot, gpio.DIR_OUT, write);
-
 
 
 var numbers = {
@@ -94,8 +162,6 @@ function write(err) {
 
 
    if(count == 1){
- //     pub();
-
  
     gpio.write(a, numbers.one[0]) ;
 
@@ -113,7 +179,10 @@ function write(err) {
 
     gpio.write(dot,true) ;
 
-    
+    putData();
+
+    relayOff();
+
    }   
 
     if(count == 0){
@@ -133,6 +202,11 @@ function write(err) {
     gpio.write(g, numbers.zero[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 2){
@@ -152,6 +226,13 @@ function write(err) {
     gpio.write(g, numbers.two[6]) ;
 
     gpio.write(dot,true) ;
+
+//        putData();
+
+
+    putData();
+
+    relayOff();
    }     
 
    if(count == 3){
@@ -171,6 +252,11 @@ function write(err) {
     gpio.write(g, numbers.three[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 4){
@@ -190,6 +276,11 @@ function write(err) {
     gpio.write(g, numbers.four[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 5){
@@ -209,6 +300,11 @@ function write(err) {
     gpio.write(g, numbers.five[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 6){
@@ -228,6 +324,11 @@ function write(err) {
     gpio.write(g, numbers.six[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 7){
@@ -247,6 +348,11 @@ function write(err) {
     gpio.write(g, numbers.seven[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }    
 
    if(count == 8){
@@ -266,6 +372,11 @@ function write(err) {
     gpio.write(g, numbers.eight[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
    }  
 
    if(count == 9){
@@ -285,56 +396,51 @@ function write(err) {
     gpio.write(g, numbers.nine[6]) ;
 
     gpio.write(dot,true) ;
+
+        putData();
+
+        relayOff();
+
     
-    relay.write(0, function(err){
-      if (err) throw err;
-      console.log('relay-off');
-    });
+//     relay.write(0, function(err){
+//       if (err) throw err;
+//       console.log('relay-off');
+//     });
 
-    relay.unexport();
- 
-    // gpio.write(11, 0, function(err) {
-    //     if (err) throw err;
-    //     console.log('Written to pin');
-    //     gpio.destroy(11);
-    // });
+//     relay.unexport();
 
-
-  } 
+ } 
 
   
-  device
-  .on('connect', function() {
-    console.log('connect');
-   // device.subscribe('topic_1');
-    device.publish('prepaid', JSON.stringify({ test_data: count}));
-    console.log("Published!!");
-  });
+//   device
+//   .on('connect', function() {
+//     console.log('connect');
+//    // device.subscribe('topic_1');
+//     device.publish('prepaid', JSON.stringify({ test_data: count}));
+//     console.log("Published!!");
+//   });
 
-device
-  .on('message', function(topic, payload) {
-    console.log('message', topic, payload.toString());
-  });  
+// device
+//   .on('message', function(topic, payload) {
+//     console.log('message', topic, payload.toString());
+//   });  
    
 
 }
 
 
-  device
-  .on('connect', function() {
-    console.log('connect');
-   // device.subscribe('topic_1');
-    device.publish('prepaid', JSON.stringify({ test_data: count}));
-    console.log("Published!!");
-  });
+//   device
+//   .on('connect', function() {
+//     console.log('connect');
+//    // device.subscribe('topic_1');
+//     device.publish('prepaid', JSON.stringify({ test_data: count}));
+//     console.log("Published!!");
+//   });
 
-device
-  .on('message', function(topic, payload) {
-    console.log('message', topic, payload.toString());
-  });  
-
-
-
+// device
+//   .on('message', function(topic, payload) {
+//     console.log('message', topic, payload.toString());
+//   });  
 });
 
 gpio.setup(3, gpio.DIR_IN, gpio.EDGE_BOTH);
